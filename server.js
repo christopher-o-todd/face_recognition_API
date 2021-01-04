@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt-nodejs');
 
 
 const app = express();
@@ -23,6 +24,13 @@ const database = {
             entries: 0,
             joined: new Date()
         }
+    ],
+    login: [
+        {
+            id: '987',
+            hash: '',
+            email: 'john@gmail.com'
+        }
     ]
 }
 
@@ -31,6 +39,13 @@ app.get('/', (req, res) => {
 })
 
 app.post('/signin', (req, res) => {
+    // Load hash from your password DB.
+    bcrypt.compare("apples", '$2a$10$BTaG1j27VZSPiOBB04W0w.DTsEsKfL578HMQ8e5J0mUu.MGZNtJUG', function(err, res) {
+        console.log('first guess', res)
+    });
+    bcrypt.compare("veggies", '$2a$10$BTaG1j27VZSPiOBB04W0w.DTsEsKfL578HMQ8e5J0mUu.MGZNtJUG', function(err, res) {
+        console.log('second guess', res)
+    });
     if (req.body.email === database.users[0].email &&
         req.body.password === database.users[0].password) {
             res.json('success');
@@ -52,16 +67,41 @@ app.post('/register', (req, res) => {
     res.json(database.users[database.users.length-1])
 })
 
+app.get('/profile/:id', (req, res) => { //loop through to display the logged in user
+    const { id } = req.params;
+    let found = false;
+    database.users.forEach(user => {
+        if (user.id === id) {
+            found = true;
+            return res.json(user); //if the user is found return it
+        } 
+    })
+    if (!found) {
+        res.status(400).json('not found');
+    }
+})
+
+app.post('/image', (req, res) => {
+    const { id } = req.body;
+    let found = false;
+    database.users.forEach(user => {
+        if (user.id === id) {
+            found = true;
+            user.entries++
+            return res.json(user.entries); //if the user is found return it
+        } 
+    })
+    if (!found) {
+        res.status(400).json('not found');
+    }
+})
+
+//Password encryption using bcrypt node package
+
+
+
+
 app.listen(3000, () => {
     console.log('app is running on port 3000');
 })
 
-/*
-/ --> res = this is working
-/signin --> POST = success/fail
-/register --> POST = user object
-/profile/:userId --> GET = user
-/image --> PUT --> user 
-
-
-*/
