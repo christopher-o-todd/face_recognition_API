@@ -3,6 +3,23 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
 
+const knex = require('knex')
+
+//connect server to db using knex npm package
+const db = knex({
+    client: 'pg', //postgres
+    connection: {
+      host : '127.0.0.1', //localhost
+      user : 'postgres', //default username for windows
+      password : 'MyPassword2021', //confirm this is right
+      database : 'smart_brain'
+    }
+});
+
+db.select('*').from('users').then(data => {
+    //console.log(data);
+});
+
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -57,24 +74,27 @@ app.post('/signin', (req, res) => {
 
 app.post('/register', (req, res) => {
     const { email, name, password } = req.body;
-    database.users.push({
-        id: '125',
-        name: name,
-        email: email,
-        entries: 0,
-        joined: new Date()
+    db('users')
+    .returning('*') //knex returns all users
+        .insert({
+            email: email,
+            name: name,
+            joined: new Date()
     })
-    res.json(database.users[database.users.length-1])
+        .then(user => {
+            res.json(user[0]);
+        })
+        .catch(err => res.status(400).json('unable to register'))
 })
 
 app.get('/profile/:id', (req, res) => { //loop through to display the logged in user
     const { id } = req.params;
     let found = false;
-    database.users.forEach(user => {
-        if (user.id === id) {
-            found = true;
-            return res.json(user); //if the user is found return it
-        } 
+    db.select('*').from('users').where({
+        id: id
+    })
+    .then(user => {
+        console.log(user);
     })
     if (!found) {
         res.status(400).json('not found');
@@ -101,7 +121,7 @@ app.put('/image', (req, res) => {
 
 
 
-app.listen(8080, () => {
-    console.log('app is running on port 8080');
+app.listen(3000, () => {
+    console.log('app is running on port 3000');
 })
 
