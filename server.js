@@ -42,14 +42,14 @@ app.get('/', (req, res) => {
 app.post('/signin', (req, res) => {
     // Load hash from your password DB.
     bcrypt.compare("apples", '$2a$10$BTaG1j27VZSPiOBB04W0w.DTsEsKfL578HMQ8e5J0mUu.MGZNtJUG', function(err, res) {
-        console.log('first guess', res)
+        //console.log('first guess', res)
     });
     bcrypt.compare("veggies", '$2a$10$BTaG1j27VZSPiOBB04W0w.DTsEsKfL578HMQ8e5J0mUu.MGZNtJUG', function(err, res) {
-        console.log('second guess', res)
+        //console.log('second guess', res)
     });
     if (req.body.email === database.users[0].email &&
         req.body.password === database.users[0].password) {
-            res.json('success');
+            res.json(database.users[0]);
         } else {
             res.status(400).json('error logging in');
         }
@@ -81,13 +81,13 @@ app.get('/profile/:id', (req, res) => { //loop through to display the logged in 
     }
 })
 
-app.post('/image', (req, res) => {
+app.put('/image', (req, res) => {
     const { id } = req.body;
     let found = false;
     database.users.forEach(user => {
         if (user.id === id) {
             found = true;
-            user.entries++
+            user.entries++ //increment number of entries
             return res.json(user.entries); //if the user is found return it
         } 
     })
