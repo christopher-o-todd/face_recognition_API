@@ -13,7 +13,7 @@ const image = require('./controllers/image');
 const db = knex({
     client: 'pg', //postgres
     connection: {
-      host : '127.0.0.1', //localhost
+      host : 'arcane-eyrie-88621', 
       user : 'postgres', //default username for windows
       password : 'MyPassword2021', 
       database : 'smart_brain'
