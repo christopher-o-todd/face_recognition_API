@@ -10,11 +10,10 @@ const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 
 //connect server to db using knex npm package
-const db = knex({
-    client: 'pg', //postgres
+const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: {
-        rejectUnauthorized: false
+      rejectUnauthorized: false
     }
 });
 
